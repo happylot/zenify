@@ -7,6 +7,7 @@ Zenify deploys to the production VPS with GitHub Actions over SSH.
 - Host: `14.225.7.175`
 - SSH port: `1786`
 - App directory: `/var/www/zenify`
+- App port: `3001`
 - Process manager: `pm2`
 - Reverse proxy: `nginx`
 - Domain: `zenify.cx`
@@ -29,7 +30,7 @@ NEXT_PUBLIC_PAYPAL_CLIENT_ID=
 PAYPAL_CLIENT_ID=
 PAYPAL_CLIENT_SECRET=
 PAYPAL_ENVIRONMENT=live
-PORT=3000
+PORT=3001
 ```
 
 ## First-time bootstrap
