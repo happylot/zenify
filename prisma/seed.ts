@@ -4,6 +4,7 @@ import {
   PlanChangeType,
   PlanCode,
   PrismaClient,
+  SignupLeadStatus,
   SubscriptionStatus,
   TrialStatus,
   WorkspaceStatus,
@@ -12,6 +13,7 @@ import {
 const prisma = new PrismaClient();
 
 async function main() {
+  await prisma.signupLead.deleteMany();
   await prisma.paymentAttempt.deleteMany();
   await prisma.invoice.deleteMany();
   await prisma.planChange.deleteMany();
@@ -145,6 +147,37 @@ async function main() {
       unlockedAt: new Date("2026-04-11T00:00:00.000Z"),
       workspaceId: nova.workspaces[0].id,
     },
+  });
+
+  await prisma.signupLead.createMany({
+    data: [
+      {
+        email: "thao@eastsea.vn",
+        company: "East Sea Logistics",
+        workspaceSlug: "eastsea-logistics",
+        teamSize: "26-100",
+        primaryGoal: "omnichannel-support",
+        status: SignupLeadStatus.NEW,
+      },
+      {
+        email: "mai@luminahospitality.vn",
+        company: "Lumina Hospitality",
+        workspaceSlug: "lumina-hospitality",
+        teamSize: "10-25",
+        primaryGoal: "ai-automation",
+        status: SignupLeadStatus.CONTACTED,
+        contactedAt: new Date("2026-04-26T10:00:00.000Z"),
+      },
+      {
+        email: "ops@brightpath.edu",
+        company: "BrightPath Education",
+        workspaceSlug: "brightpath-education",
+        teamSize: "6-10",
+        primaryGoal: "trial-plg",
+        status: SignupLeadStatus.QUALIFIED,
+        contactedAt: new Date("2026-04-24T08:30:00.000Z"),
+      },
+    ],
   });
 }
 

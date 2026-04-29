@@ -51,6 +51,14 @@ enum PaymentAttemptStatus {
   FAILED
 }
 
+enum SignupLeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CONVERTED
+  DISQUALIFIED
+}
+
 enum PlanChangeType {
   UPGRADE
   DOWNGRADE
@@ -71,6 +79,22 @@ model Customer {
   workspaces   Workspace[]
   invoices     Invoice[]
   planChanges  PlanChange[]
+}
+
+model SignupLead {
+  id              String           @id @default(cuid())
+  email           String           @unique
+  company         String
+  workspaceSlug   String           @unique
+  teamSize        String
+  primaryGoal     String
+  source          String           @default("website-signup")
+  status          SignupLeadStatus @default(NEW)
+  notes           String?
+  contactedAt     DateTime?
+  convertedAt     DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 }
 
 model Workspace {
