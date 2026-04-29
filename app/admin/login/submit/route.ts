@@ -2,14 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   ADMIN_SESSION_COOKIE,
   createAdminSessionToken,
+  getAdminHost,
   getAdminHomePath,
   getAdminSessionCookieOptions,
   normalizeNextPath,
 } from "@/lib/admin-auth";
 import { isAdminLoginConfigured, verifyAdminCredentials } from "@/lib/admin-password";
 
+function buildPublicUrl(request: NextRequest, pathname: string) {
+  const protocol = request.headers.get("x-forwarded-proto") ?? request.nextUrl.protocol.replace(":", "");
+  return new URL(pathname, `${protocol}://${getAdminHost()}`);
+}
+
 function buildLoginRedirect(request: NextRequest, error: string, nextPath: string) {
-  const url = new URL("/admin/login", request.url);
+  const url = buildPublicUrl(request, "/admin/login");
   url.searchParams.set("error", error);
 
   if (nextPath !== getAdminHomePath()) {
@@ -34,7 +40,7 @@ export async function POST(request: NextRequest) {
   }
 
   const token = await createAdminSessionToken(email);
-  const response = NextResponse.redirect(new URL(nextPath, request.url));
+  const response = NextResponse.redirect(buildPublicUrl(request, nextPath));
   response.cookies.set(ADMIN_SESSION_COOKIE, token, getAdminSessionCookieOptions());
   return response;
 }
