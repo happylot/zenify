@@ -16,7 +16,7 @@ export function AppShell({
       <div className="container app-layout">
         <aside className="app-sidebar">
           <p className="eyebrow">Application</p>
-          <h2>Zenify App</h2>
+          <h2>Zenify Admin</h2>
           <nav className="app-nav">
             {appAreas.map((item) => (
               <Link key={item.href} href={item.href}>
@@ -24,6 +24,9 @@ export function AppShell({
               </Link>
             ))}
           </nav>
+          <Link href="/admin/logout" className="text-link">
+            Sign out
+          </Link>
         </aside>
         <div className="app-panel">
           <h1>{title}</h1>

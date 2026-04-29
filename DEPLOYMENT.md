@@ -11,6 +11,7 @@ Zenify deploys to the production VPS with GitHub Actions over SSH.
 - Process manager: `pm2`
 - Reverse proxy: `nginx`
 - Domain: `zenify.cx`
+- Admin domain: `admin.zenify.cx`
 
 ## GitHub Actions secrets
 
@@ -30,7 +31,22 @@ NEXT_PUBLIC_PAYPAL_CLIENT_ID=
 PAYPAL_CLIENT_ID=
 PAYPAL_CLIENT_SECRET=
 PAYPAL_ENVIRONMENT=live
+PAYPAL_WEBHOOK_ID=
+DATABASE_URL=
+CRON_SECRET=
+SITE_HOST=zenify.cx
+ADMIN_HOST=admin.zenify.cx
+ADMIN_EMAIL=ops@zenify.cx
+ADMIN_PASSWORD_HASH=
+ADMIN_SESSION_SECRET=
+ADMIN_SESSION_TTL_HOURS=12
 PORT=3001
+```
+
+Generate the admin password hash locally before you write the env file:
+
+```bash
+npm run admin:hash -- "replace-with-a-strong-password"
 ```
 
 ## First-time bootstrap
@@ -62,5 +78,5 @@ Every push to `main` triggers `.github/workflows/deploy.yml`, which:
 After nginx is active and DNS points to `14.225.7.175`, issue the certificate on the VPS:
 
 ```bash
-certbot --nginx -d zenify.cx -d www.zenify.cx
+certbot --nginx -d zenify.cx -d www.zenify.cx -d admin.zenify.cx
 ```

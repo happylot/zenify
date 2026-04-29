@@ -48,6 +48,55 @@ export type PricingPlan = {
   bullets: string[];
 };
 
+export type BillingMetric = {
+  label: string;
+  value: string;
+  note: string;
+};
+
+export type TrialWorkspace = {
+  company: string;
+  workspace: string;
+  plan: string;
+  owner: string;
+  trialEndsOn: string;
+  paymentMethod: string;
+  activation: string;
+  risk: "Low" | "Medium" | "High";
+};
+
+export type SubscriptionWorkspace = {
+  company: string;
+  plan: string;
+  seats: string;
+  billingCycle: string;
+  renewalDate: string;
+  autoRenew: string;
+  status: string;
+  action: string;
+};
+
+export type BillingInvoice = {
+  invoiceNo: string;
+  customer: string;
+  amount: string;
+  dueDate: string;
+  status: string;
+  export: string;
+};
+
+export type BillingAutomationRule = {
+  title: string;
+  description: string;
+  checkpoints: string[];
+};
+
+export type BillingAccountAction = {
+  title: string;
+  detail: string;
+  status: string;
+};
+
 export const primaryNav = [
   { href: "/", label: "Home" },
   { href: "/features", label: "Features" },
@@ -509,6 +558,152 @@ export const trialMilestones = [
   { day: "Day 3", title: "Reach first value", text: "Handle live conversations and activate your first AI or automation flow." },
   { day: "Day 7", title: "Operationalize the team", text: "Turn on reporting, QA checkpoints, and shared customer visibility." },
   { day: "Day 15", title: "Convert to paid", text: "Upgrade the workspace into a paid plan without losing settings, data, or momentum." },
+];
+
+export const billingMetrics: BillingMetric[] = [
+  { label: "Trial workspaces", value: "128", note: "34 end in the next 7 days" },
+  { label: "Active subscriptions", value: "94", note: "89 on auto-renew" },
+  { label: "MRR under management", value: "$18.4k", note: "3 accounts at payment risk" },
+  { label: "Invoices this month", value: "147", note: "11 waiting for export or follow-up" },
+];
+
+export const trialWorkspaces: TrialWorkspace[] = [
+  {
+    company: "Nova Retail",
+    workspace: "nova-retail",
+    plan: "Growth trial",
+    owner: "hang@novaretail.vn",
+    trialEndsOn: "2026-05-03",
+    paymentMethod: "Visa ending 4092",
+    activation: "8 of 10 milestones complete",
+    risk: "Low",
+  },
+  {
+    company: "Medistar Care",
+    workspace: "medistar-care",
+    plan: "Business trial",
+    owner: "ops@medistar.vn",
+    trialEndsOn: "2026-05-01",
+    paymentMethod: "No card on file",
+    activation: "3 of 10 milestones complete",
+    risk: "High",
+  },
+  {
+    company: "Apex Education",
+    workspace: "apex-edu",
+    plan: "Starter trial",
+    owner: "admin@apex.edu.vn",
+    trialEndsOn: "2026-05-06",
+    paymentMethod: "Mastercard ending 8104",
+    activation: "5 of 10 milestones complete",
+    risk: "Medium",
+  },
+];
+
+export const subscriptionWorkspaces: SubscriptionWorkspace[] = [
+  {
+    company: "Global Travel",
+    plan: "Growth",
+    seats: "18 seats",
+    billingCycle: "Annual",
+    renewalDate: "2026-06-12",
+    autoRenew: "Enabled",
+    status: "Healthy",
+    action: "Upgrade to Business",
+  },
+  {
+    company: "FreshFoods Direct",
+    plan: "Starter",
+    seats: "5 seats",
+    billingCycle: "Monthly",
+    renewalDate: "2026-05-02",
+    autoRenew: "Retry in progress",
+    status: "Payment retry",
+    action: "Collect new card",
+  },
+  {
+    company: "Prime Holdings",
+    plan: "Enterprise",
+    seats: "Custom contract",
+    billingCycle: "Annual",
+    renewalDate: "2026-07-30",
+    autoRenew: "Manual renewal",
+    status: "Review contract",
+    action: "Send renewal quote",
+  },
+  {
+    company: "BlueStone Clinic",
+    plan: "Business",
+    seats: "27 seats",
+    billingCycle: "Annual",
+    renewalDate: "2026-05-09",
+    autoRenew: "Enabled",
+    status: "Pending downgrade",
+    action: "Reduce to 20 seats",
+  },
+];
+
+export const billingInvoices: BillingInvoice[] = [
+  {
+    invoiceNo: "INV-2026-0418",
+    customer: "Global Travel",
+    amount: "$1,170",
+    dueDate: "2026-05-01",
+    status: "Paid",
+    export: "PDF + e-invoice",
+  },
+  {
+    invoiceNo: "INV-2026-0424",
+    customer: "FreshFoods Direct",
+    amount: "$145",
+    dueDate: "2026-04-30",
+    status: "Past due",
+    export: "Awaiting resend",
+  },
+  {
+    invoiceNo: "INV-2026-0432",
+    customer: "BlueStone Clinic",
+    amount: "$3,483",
+    dueDate: "2026-05-09",
+    status: "Scheduled",
+    export: "Issue after renewal",
+  },
+];
+
+export const billingAutomationRules: BillingAutomationRule[] = [
+  {
+    title: "Trial to paid conversion",
+    description: "Start the first subscription term automatically when trial expires and a valid payment method exists.",
+    checkpoints: ["Trial end scheduler", "Card validity check", "Start subscription and send confirmation"],
+  },
+  {
+    title: "Auto-renew and failed payment recovery",
+    description: "Attempt recurring charges, retry with a dunning sequence, then pause service if retries fail.",
+    checkpoints: ["Renewal webhook", "3-step retry ladder", "Grace period before lock"],
+  },
+  {
+    title: "Invoice issuing and export",
+    description: "Generate invoices after successful capture, attach tax fields, and export files for finance or customer delivery.",
+    checkpoints: ["Invoice numbering", "PDF export", "Accounting handoff"],
+  },
+];
+
+export const billingAccountActions: BillingAccountAction[] = [
+  {
+    title: "Upgrade or downgrade plan",
+    detail: "Change package, seat count, and billing cycle with proration rules or next-cycle scheduling.",
+    status: "Available for self-serve and admin-assisted flows",
+  },
+  {
+    title: "Suspend overdue accounts",
+    detail: "Lock login, stop channel processing, and show a billing recovery wall when grace period expires.",
+    status: "Automatic after dunning threshold",
+  },
+  {
+    title: "Reactivate after payment",
+    detail: "Restore workspace access automatically when invoice is settled or a new card succeeds.",
+    status: "Immediate unlock after successful capture",
+  },
 ];
 
 export function getFeature(slug: string) {

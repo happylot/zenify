@@ -4,9 +4,15 @@
   "description": "Zenify.cx is being built as a leading Customer Experience Management (`CXM`) platform for businesses of every size. The system provides an end-to-end omnichannel customer experience solution that helps companies attract, serve, retain, and grow customers through one unified SaaS platform.",
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/clean-next-cache.mjs",
     "build": "next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "admin:hash": "node scripts/admin-password-hash.mjs",
+    "pretypecheck": "next typegen",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts"
   },
   "keywords": [],
   "author": "",
@@ -14,12 +20,15 @@
   "dependencies": {
     "@paypal/react-paypal-js": "^9.2.0",
     "next": "^16.2.4",
+    "@prisma/client": "^6.8.2",
     "react": "^19.2.5",
     "react-dom": "^19.2.5"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
     "@types/react": "^19.2.14",
+    "prisma": "^6.8.2",
+    "tsx": "^4.20.0",
     "typescript": "^6.0.3"
   }
 }

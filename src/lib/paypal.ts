@@ -130,3 +130,51 @@ export async function capturePaypalOrder(orderId: string) {
     payer?: { email_address?: string };
   };
 }
+
+export async function verifyPaypalWebhookSignature({
+  authAlgo,
+  certUrl,
+  transmissionId,
+  transmissionSig,
+  transmissionTime,
+  webhookEvent,
+}: {
+  authAlgo: string;
+  certUrl: string;
+  transmissionId: string;
+  transmissionSig: string;
+  transmissionTime: string;
+  webhookEvent: unknown;
+}) {
+  const webhookId = process.env.PAYPAL_WEBHOOK_ID;
+
+  if (!webhookId) {
+    throw new Error("Missing PAYPAL_WEBHOOK_ID. Configure the PayPal webhook ID before enabling webhook processing.");
+  }
+
+  const accessToken = await getPaypalAccessToken();
+  const response = await fetch(`${PAYPAL_API_BASE}/v1/notifications/verify-webhook-signature`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({
+      auth_algo: authAlgo,
+      cert_url: certUrl,
+      transmission_id: transmissionId,
+      transmission_sig: transmissionSig,
+      transmission_time: transmissionTime,
+      webhook_id: webhookId,
+      webhook_event: webhookEvent,
+    }),
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error(await readPaypalError(response, "Failed to verify PayPal webhook"));
+  }
+
+  const json = (await response.json()) as { verification_status?: string };
+  return json.verification_status === "SUCCESS";
+}

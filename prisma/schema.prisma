@@ -1,0 +1,213 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PlanCode {
+  STARTER
+  GROWTH
+  BUSINESS
+  ENTERPRISE
+}
+
+enum WorkspaceStatus {
+  TRIAL
+  ACTIVE
+  PAST_DUE
+  SUSPENDED
+  CANCELED
+}
+
+enum TrialStatus {
+  ACTIVE
+  CONVERTED
+  EXPIRED
+  CANCELED
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  SUSPENDED
+}
+
+enum InvoiceStatus {
+  DRAFT
+  OPEN
+  PAID
+  VOID
+  UNCOLLECTIBLE
+}
+
+enum PaymentAttemptStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+}
+
+enum PlanChangeType {
+  UPGRADE
+  DOWNGRADE
+  SEAT_INCREASE
+  SEAT_DECREASE
+  BILLING_CYCLE_CHANGE
+}
+
+model Customer {
+  id           String         @id @default(cuid())
+  name         String
+  email        String         @unique
+  company      String
+  phone        String?
+  country      String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  workspaces   Workspace[]
+  invoices     Invoice[]
+  planChanges  PlanChange[]
+}
+
+model Workspace {
+  id                    String             @id @default(cuid())
+  slug                  String             @unique
+  name                  String
+  status                WorkspaceStatus    @default(TRIAL)
+  currentPlan           PlanCode
+  seatCount             Int                @default(1)
+  trialEndsAt           DateTime?
+  autoRenew             Boolean            @default(true)
+  paymentMethodBrand    String?
+  paymentMethodLast4    String?
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+  customerId            String
+  customer              Customer           @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  trial                 Trial?
+  subscription          Subscription?
+  invoices              Invoice[]
+  paymentAttempts       PaymentAttempt[]
+  planChanges           PlanChange[]
+  accountLocks          AccountLock[]
+}
+
+model Trial {
+  id             String      @id @default(cuid())
+  status         TrialStatus @default(ACTIVE)
+  startsAt       DateTime    @default(now())
+  endsAt         DateTime
+  convertedAt    DateTime?
+  activationRate Int         @default(0)
+  workspaceId    String      @unique
+  workspace      Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model Subscription {
+  id                String             @id @default(cuid())
+  provider          String             @default("paypal")
+  providerRef       String?            @unique
+  status            SubscriptionStatus @default(TRIALING)
+  planCode          PlanCode
+  billingCycle      String
+  unitAmount        Decimal            @db.Decimal(10, 2)
+  currency          String             @default("USD")
+  currentPeriodStart DateTime
+  currentPeriodEnd  DateTime
+  renewsAt          DateTime
+  canceledAt        DateTime?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  workspaceId       String             @unique
+  workspace         Workspace          @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  invoices          Invoice[]
+  paymentAttempts   PaymentAttempt[]
+  planChanges       PlanChange[]
+}
+
+model Invoice {
+  id             String        @id @default(cuid())
+  invoiceNumber  String        @unique
+  status         InvoiceStatus @default(DRAFT)
+  subtotal       Decimal       @db.Decimal(10, 2)
+  taxAmount      Decimal       @default(0) @db.Decimal(10, 2)
+  totalAmount    Decimal       @db.Decimal(10, 2)
+  currency       String        @default("USD")
+  issuedAt       DateTime?
+  dueAt          DateTime?
+  paidAt         DateTime?
+  exportUrl      String?
+  customerId     String
+  workspaceId    String
+  subscriptionId String?
+  customer       Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  workspace      Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  paymentAttempts PaymentAttempt[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model PaymentAttempt {
+  id             String               @id @default(cuid())
+  provider       String               @default("paypal")
+  providerRef    String?              @unique
+  status         PaymentAttemptStatus @default(PENDING)
+  amount         Decimal              @db.Decimal(10, 2)
+  currency       String               @default("USD")
+  errorCode      String?
+  errorMessage   String?
+  attemptedAt    DateTime             @default(now())
+  customerId     String?
+  workspaceId    String
+  subscriptionId String?
+  invoiceId      String?
+  workspace      Workspace            @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  subscription   Subscription?        @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  invoice        Invoice?             @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+}
+
+model PlanChange {
+  id               String         @id @default(cuid())
+  type             PlanChangeType
+  fromPlan         PlanCode
+  toPlan           PlanCode
+  fromSeatCount    Int
+  toSeatCount      Int
+  effectiveAt      DateTime
+  status           String         @default("scheduled")
+  createdAt        DateTime       @default(now())
+  customerId       String
+  workspaceId      String
+  subscriptionId   String?
+  customer         Customer       @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  workspace        Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  subscription     Subscription?  @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+}
+
+model AccountLock {
+  id          String    @id @default(cuid())
+  reason      String
+  active      Boolean   @default(true)
+  lockedAt    DateTime  @default(now())
+  unlockedAt  DateTime?
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model BillingWebhookEvent {
+  id           String   @id @default(cuid())
+  provider     String
+  eventId      String   @unique
+  eventType    String
+  resourceId   String?
+  status       String   @default("received")
+  payload      Json
+  errorMessage String?
+  receivedAt   DateTime @default(now())
+  processedAt  DateTime?
+}
