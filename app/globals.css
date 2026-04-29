@@ -446,7 +446,7 @@ h3 {
 }
 
 .split {
-  align-items: center;
+  align-items: flex-start;
   gap: 48px;
 }
 
@@ -458,9 +458,13 @@ h3 {
   min-height: 520px;
   border-radius: 32px;
   box-shadow: var(--shadow);
+  position: sticky;
+  top: 112px;
+  align-self: flex-start;
+  overflow: hidden;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(7, 73, 85, 0.28)),
-    url("https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=900&q=80")
+    url("../zenify-hero-banner.avif")
       center/cover;
 }
 
@@ -687,6 +691,8 @@ h3 {
 
 .pricing-card {
   width: calc(25% - 17px);
+  display: flex;
+  flex-direction: column;
 }
 
 .pricing-card-featured {
@@ -731,6 +737,11 @@ h3 {
 
 .pricing-card ul {
   margin: 18px 0 24px;
+  flex: 1;
+}
+
+.pricing-card .button {
+  margin-top: auto;
 }
 
 .detail-card h2,
@@ -748,21 +759,52 @@ h3 {
 }
 
 .billing-toggle {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 14px;
   margin-bottom: 26px;
 }
 
-.toggle-pill {
+.billing-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   gap: 10px;
-  padding: 10px 16px;
+  min-height: 52px;
+  padding: 12px 20px;
+  border: 1px solid rgba(13, 111, 137, 0.14);
   border-radius: 999px;
-  background: rgba(10, 160, 174, 0.08);
+  color: var(--primary-deep);
+  background: rgba(255, 255, 255, 0.84);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease;
 }
 
-.toggle-pill b {
+.billing-tab:hover {
+  transform: translateY(-1px);
+  border-color: rgba(10, 160, 174, 0.24);
+}
+
+.billing-tab-active {
+  border-color: rgba(10, 160, 174, 0.24);
+  box-shadow: 0 16px 40px rgba(14, 78, 92, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(222, 248, 247, 0.82));
+}
+
+.billing-save {
+  display: inline-flex;
+  padding: 6px 10px;
+  border-radius: 999px;
   color: var(--primary-deep);
+  background: rgba(10, 160, 174, 0.1);
 }
 
 .pricing-facts,
@@ -988,6 +1030,10 @@ h3 {
   gap: 24px;
 }
 
+.cta-strip .button {
+  white-space: nowrap;
+}
+
 .comparison-table {
   margin-top: 18px;
   border: 1px solid var(--line);
@@ -1130,6 +1176,11 @@ h3 {
 
   .app-sidebar {
     position: static;
+  }
+
+  .photo-card {
+    position: static;
+    top: auto;
   }
 }
 

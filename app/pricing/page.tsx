@@ -1,8 +1,37 @@
+"use client";
+
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { PageHero } from "@/components/page-hero";
 import { pricingPlans } from "@/lib/site-data";
 
 export default function PricingPage() {
+  const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("annual");
+
+  const plans = useMemo(
+    () =>
+      pricingPlans.map((plan) => {
+        const monthlyValue = Number.parseFloat(plan.monthlyPrice.replace(/[^0-9.]/g, ""));
+        const hasNumericPrice = Number.isFinite(monthlyValue);
+        const annualMonthlyValue = hasNumericPrice ? Math.round(monthlyValue * 0.82) : null;
+
+        return {
+          ...plan,
+          displayPrice:
+            billingCycle === "annual" && annualMonthlyValue !== null
+              ? `$${annualMonthlyValue}`
+              : plan.monthlyPrice,
+          billingNote:
+            annualMonthlyValue === null
+              ? "Contact sales for a tailored annual contract."
+              : billingCycle === "annual"
+                ? `Save 18% with annual billing.`
+                : "Billed monthly.",
+        };
+      }),
+    [billingCycle],
+  );
+
   return (
     <main>
       <PageHero
@@ -13,14 +42,24 @@ export default function PricingPage() {
       <section className="section section-tight">
         <div className="container">
           <div className="billing-toggle">
-            <span>Monthly billing</span>
-            <div className="toggle-pill">
+            <button
+              type="button"
+              className={`billing-tab ${billingCycle === "monthly" ? "billing-tab-active" : ""}`}
+              onClick={() => setBillingCycle("monthly")}
+            >
+              Monthly billing
+            </button>
+            <button
+              type="button"
+              className={`billing-tab ${billingCycle === "annual" ? "billing-tab-active" : ""}`}
+              onClick={() => setBillingCycle("annual")}
+            >
               <span>Annual billing</span>
-              <b>Save up to 18%</b>
-            </div>
+              <b className="billing-save">Save up to 18%</b>
+            </button>
           </div>
           <div className="pricing-grid">
-            {pricingPlans.map((plan) => (
+            {plans.map((plan) => (
               <article
                 key={plan.name}
                 className={`pricing-card ${plan.highlighted ? "pricing-card-featured" : ""}`}
@@ -29,9 +68,9 @@ export default function PricingPage() {
                 <h3>{plan.name}</h3>
                 <p className="pricing-seat">{plan.seats}</p>
                 <div className="price-stack">
-                  <strong>{plan.monthlyPrice}</strong>
+                  <strong>{plan.displayPrice}</strong>
                   <span>per seat / month</span>
-                  <small>{plan.annualPrice} billed annually</small>
+                  <small>{plan.billingNote}</small>
                 </div>
                 <p>{plan.description}</p>
                 <ul>
