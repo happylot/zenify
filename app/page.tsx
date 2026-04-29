@@ -1,7 +1,122 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { HeroHeadline } from "@/components/hero-headline";
 
+function FeatureIcon({ children }: { children: ReactNode }) {
+  return (
+    <span className="feature-icon" aria-hidden="true">
+      <svg viewBox="0 0 48 48" fill="none" role="presentation">
+        {children}
+      </svg>
+    </span>
+  );
+}
+
 export default function HomePage() {
+  const aiCxFeatures = [
+    {
+      title: "Omnichannel Inbox",
+      copy: "Bring Facebook, Zalo, WhatsApp, VoIP, and more into one unified workspace.",
+      icon: (
+        <>
+          <rect x="8" y="12" width="32" height="22" rx="9" stroke="currentColor" strokeWidth="2.4" />
+          <path d="M16 20h16M16 26h10" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+          <path d="M20 34l-5 5v-5" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+        </>
+      ),
+    },
+    {
+      title: "Ticketing & SLA Management",
+      copy: "Route requests intelligently and manage response and resolution targets automatically.",
+      icon: (
+        <>
+          <path d="M14 15.5h20a3 3 0 0 1 3 3v11a3 3 0 0 1-3 3H14a3 3 0 0 1-3-3v-11a3 3 0 0 1 3-3Z" stroke="currentColor" strokeWidth="2.4" />
+          <path d="M19 15.5v-2a5 5 0 0 1 10 0v2" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+          <path d="M24 20v5l3 2" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+        </>
+      ),
+    },
+    {
+      title: "Sales CRM",
+      copy: "Track deals, tasks, and pipelines from prospecting to conversion with one shared record.",
+      icon: (
+        <>
+          <path d="M12 31c2.5-7 9.7-12 17.5-12 2.4 0 4.7.5 6.7 1.5" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+          <circle cx="17" cy="18" r="4.5" stroke="currentColor" strokeWidth="2.4" />
+          <circle cx="31" cy="28" r="7" stroke="currentColor" strokeWidth="2.4" />
+          <path d="m31 24 1.7 3.2L36 29" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+        </>
+      ),
+    },
+    {
+      title: "Workflow Automation",
+      copy: "Design complex workflows with a drag-and-drop interface without writing code.",
+      icon: (
+        <>
+          <rect x="10" y="10" width="10" height="10" rx="3" stroke="currentColor" strokeWidth="2.4" />
+          <rect x="28" y="10" width="10" height="10" rx="3" stroke="currentColor" strokeWidth="2.4" />
+          <rect x="19" y="28" width="10" height="10" rx="3" stroke="currentColor" strokeWidth="2.4" />
+          <path d="M20 15h8M24 20v8" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+        </>
+      ),
+    },
+    {
+      title: "AI Chatbot",
+      copy: "Respond with context, learn from every conversation, and improve customer support over time.",
+      icon: (
+        <>
+          <path d="M12 17a8 8 0 0 1 8-8h8a8 8 0 0 1 8 8v8a8 8 0 0 1-8 8h-9l-7 6v-9a8 8 0 0 1-3-6v-7Z" stroke="currentColor" strokeWidth="2.4" strokeLinejoin="round" />
+          <circle cx="20" cy="21" r="1.5" fill="currentColor" />
+          <circle cx="28" cy="21" r="1.5" fill="currentColor" />
+          <path d="M19.5 27c1.3 1.3 3 2 4.5 2s3.2-.7 4.5-2" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+        </>
+      ),
+    },
+    {
+      title: "AI Voicebot",
+      copy: "Handle inbound and outbound calls with natural voice interactions and speech recognition.",
+      icon: (
+        <>
+          <path d="M24 11v12" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+          <rect x="19" y="8" width="10" height="18" rx="5" stroke="currentColor" strokeWidth="2.4" />
+          <path d="M15 23a9 9 0 0 0 18 0M24 32v6M19 38h10" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+        </>
+      ),
+    },
+    {
+      title: "Smart QA System",
+      copy: "Score service quality against CX standards and generate precise feedback for improvement.",
+      icon: (
+        <>
+          <path d="M24 10 34 14v8c0 7-4.4 13.2-10 15-5.6-1.8-10-8-10-15v-8l10-4Z" stroke="currentColor" strokeWidth="2.4" strokeLinejoin="round" />
+          <path d="m19.5 24 3 3 6-7" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+        </>
+      ),
+    },
+    {
+      title: "AI Agent Coaching",
+      copy: "Use MBTI and DISC-informed coaching to elevate each agent with tailored recommendations.",
+      icon: (
+        <>
+          <circle cx="18" cy="18" r="5" stroke="currentColor" strokeWidth="2.4" />
+          <circle cx="31" cy="16" r="4" stroke="currentColor" strokeWidth="2.4" />
+          <path d="M10 34c1.8-5.2 6.4-8 11-8s9.2 2.8 11 8M28 33c.8-2.7 2.8-4.7 5.5-5.7" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+        </>
+      ),
+    },
+    {
+      title: "Real-time Insight Dashboards",
+      copy: "Monitor KPIs, uncover trends, and act quickly with live CX analytics and alerts.",
+      icon: (
+        <>
+          <path d="M12 34h24" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+          <path d="M16 30V22M24 30V16M32 30v-6" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+          <path d="m15 18 7-6 5 4 7-7" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+        </>
+      ),
+    },
+  ];
+
   return (
     <main>
       <section className="hero">
@@ -108,18 +223,9 @@ export default function HomePage() {
             </p>
           </div>
           <div className="feature-grid">
-            {[
-              ["Omnichannel Inbox", "Bring Facebook, Zalo, WhatsApp, VoIP, and more into one unified workspace."],
-              ["Ticketing & SLA Management", "Route requests intelligently and manage response and resolution targets automatically."],
-              ["Sales CRM", "Track deals, tasks, and pipelines from prospecting to conversion with one shared record."],
-              ["Workflow Automation", "Design complex workflows with a drag-and-drop interface without writing code."],
-              ["AI Chatbot", "Respond with context, learn from every conversation, and improve customer support over time."],
-              ["AI Voicebot", "Handle inbound and outbound calls with natural voice interactions and speech recognition."],
-              ["Smart QA System", "Score service quality against CX standards and generate precise feedback for improvement."],
-              ["AI Agent Coaching", "Use MBTI and DISC-informed coaching to elevate each agent with tailored recommendations."],
-              ["Real-time Insight Dashboards", "Monitor KPIs, uncover trends, and act quickly with live CX analytics and alerts."],
-            ].map(([title, copy]) => (
+            {aiCxFeatures.map(({ title, copy, icon }) => (
               <article key={title} className="feature-card">
+                <FeatureIcon>{icon}</FeatureIcon>
                 <h3>{title}</h3>
                 <p>{copy}</p>
               </article>
