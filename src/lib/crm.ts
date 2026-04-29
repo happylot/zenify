@@ -1,5 +1,11 @@
-import { SignupLeadStatus } from "@prisma/client";
 import { db } from "@/lib/db";
+
+const SIGNUP_LEAD_STATUSES = ["NEW", "CONTACTED", "QUALIFIED", "CONVERTED", "DISQUALIFIED"] as const;
+type SignupLeadStatus = (typeof SIGNUP_LEAD_STATUSES)[number];
+
+function isSignupLeadStatus(input: string): input is SignupLeadStatus {
+  return (SIGNUP_LEAD_STATUSES as readonly string[]).includes(input);
+}
 
 function normalizeWorkspaceSlug(input: string) {
   return input
@@ -38,7 +44,7 @@ export async function createSignupLead(input: {
       teamSize: input.teamSize,
       primaryGoal: input.primaryGoal,
       source: "website-signup",
-      status: SignupLeadStatus.NEW,
+      status: "NEW" as any,
       notes: null,
       contactedAt: null,
       convertedAt: null,
@@ -78,23 +84,27 @@ export async function getSignupLeadSummary() {
   for (const row of leads) {
     summary.total += row._count._all;
 
-    if (row.status === SignupLeadStatus.NEW) summary.new = row._count._all;
-    if (row.status === SignupLeadStatus.CONTACTED) summary.contacted = row._count._all;
-    if (row.status === SignupLeadStatus.QUALIFIED) summary.qualified = row._count._all;
-    if (row.status === SignupLeadStatus.CONVERTED) summary.converted = row._count._all;
-    if (row.status === SignupLeadStatus.DISQUALIFIED) summary.disqualified = row._count._all;
+    if (row.status === "NEW") summary.new = row._count._all;
+    if (row.status === "CONTACTED") summary.contacted = row._count._all;
+    if (row.status === "QUALIFIED") summary.qualified = row._count._all;
+    if (row.status === "CONVERTED") summary.converted = row._count._all;
+    if (row.status === "DISQUALIFIED") summary.disqualified = row._count._all;
   }
 
   return summary;
 }
 
-export async function updateSignupLeadStatus(leadId: string, status: SignupLeadStatus) {
+export async function updateSignupLeadStatus(leadId: string, status: string) {
+  if (!isSignupLeadStatus(status)) {
+    throw new Error("Invalid signup lead status");
+  }
+
   return db.signupLead.update({
     where: { id: leadId },
     data: {
-      status,
-      contactedAt: status === SignupLeadStatus.CONTACTED ? new Date() : undefined,
-      convertedAt: status === SignupLeadStatus.CONVERTED ? new Date() : null,
+      status: status as any,
+      contactedAt: status === "CONTACTED" ? new Date() : undefined,
+      convertedAt: status === "CONVERTED" ? new Date() : null,
     },
   });
 }

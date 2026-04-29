@@ -1,6 +1,8 @@
-import { SignupLeadStatus } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { updateSignupLeadStatus } from "@/lib/crm";
+
+const SIGNUP_LEAD_STATUSES = ["NEW", "CONTACTED", "QUALIFIED", "CONVERTED", "DISQUALIFIED"] as const;
+type SignupLeadStatus = (typeof SIGNUP_LEAD_STATUSES)[number];
 
 function buildPublicUrl(request: NextRequest, pathname: string) {
   const forwardedHost = request.headers.get("x-forwarded-host");
@@ -10,7 +12,7 @@ function buildPublicUrl(request: NextRequest, pathname: string) {
 }
 
 function isSignupLeadStatus(input: string): input is SignupLeadStatus {
-  return Object.values(SignupLeadStatus).includes(input as SignupLeadStatus);
+  return (SIGNUP_LEAD_STATUSES as readonly string[]).includes(input);
 }
 
 export async function POST(

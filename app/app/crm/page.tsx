@@ -1,10 +1,12 @@
-import { SignupLeadStatus } from "@prisma/client";
 import { AppShell } from "@/components/app-shell";
 import { getSignupLeadSummary, listSignupLeads } from "@/lib/crm";
 
 export const dynamic = "force-dynamic";
 
-const statusLabels: Record<SignupLeadStatus, string> = {
+const SIGNUP_LEAD_STATUSES = ["NEW", "CONTACTED", "QUALIFIED", "CONVERTED", "DISQUALIFIED"] as const;
+type SignupLeadStatus = (typeof SIGNUP_LEAD_STATUSES)[number];
+
+const statusLabels: Record<string, string> = {
   NEW: "New",
   CONTACTED: "Contacted",
   QUALIFIED: "Qualified",
@@ -166,10 +168,10 @@ export default async function AppCrmPage() {
 
                   <div className="crm-actions">
                     {[
-                      SignupLeadStatus.CONTACTED,
-                      SignupLeadStatus.QUALIFIED,
-                      SignupLeadStatus.CONVERTED,
-                      SignupLeadStatus.DISQUALIFIED,
+                      "CONTACTED",
+                      "QUALIFIED",
+                      "CONVERTED",
+                      "DISQUALIFIED",
                     ].map((status) => (
                       <form key={status} action={`/app/crm/leads/${lead.id}/status`} method="post">
                         <input type="hidden" name="status" value={status} />
