@@ -663,8 +663,26 @@ h3 {
   padding: 38px 42px;
   color: white;
   background:
-    radial-gradient(circle at top right, rgba(255, 255, 255, 0.18), transparent 26%),
-    linear-gradient(135deg, #0f7f8a 0%, #164f69 100%);
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.12), transparent 28%),
+    linear-gradient(135deg, #0b6f7d 0%, #123f56 100%);
+}
+
+.cta-panel h2,
+.cta-panel p,
+.cta-panel .eyebrow {
+  color: #f5feff;
+}
+
+.cta-panel .eyebrow {
+  opacity: 0.92;
+}
+
+.cta-panel h2 {
+  max-width: 100%;
+}
+
+.cta-panel-actions .button {
+  white-space: nowrap;
 }
 
 .cta-panel-actions,
@@ -674,8 +692,13 @@ h3 {
   gap: 12px;
 }
 
+.cta-panel-actions {
+  align-items: center;
+  justify-content: center;
+}
+
 .text-link-light {
-  color: rgba(255, 255, 255, 0.86);
+  color: rgba(245, 254, 255, 0.96);
 }
 
 .card {
