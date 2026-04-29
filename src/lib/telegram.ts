@@ -9,6 +9,7 @@ export async function sendTelegramMessage(text: string): Promise<TelegramSendRes
   const chatId = process.env.TELEGRAM_CHAT_ID;
 
   if (!token || !chatId) {
+    console.error("[telegram] Missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID");
     return { ok: false, reason: "Missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID" };
   }
 
@@ -25,8 +26,8 @@ export async function sendTelegramMessage(text: string): Promise<TelegramSendRes
   });
 
   if (!res.ok) {
-    const body = await res.text().catch(() => "");
-    return { ok: false, reason: `Telegram request failed: ${res.status} ${body}` };
+    console.error(`[telegram] sendMessage failed: ${res.status}`);
+    return { ok: false, reason: `Telegram request failed: ${res.status}` };
   }
 
   return { ok: true };
