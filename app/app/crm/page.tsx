@@ -56,6 +56,7 @@ export default async function AppCrmPage() {
     disqualified: 0,
   };
   let leads = [] as Awaited<ReturnType<typeof listSignupLeads>>;
+  type Lead = Awaited<ReturnType<typeof listSignupLeads>> extends (infer U)[] ? U : never;
 
   try {
     [summary, leads] = await Promise.all([getSignupLeadSummary(), listSignupLeads()]);
@@ -112,7 +113,7 @@ export default async function AppCrmPage() {
 
           {leads.length ? (
             <div className="crm-lead-grid">
-              {leads.map((lead) => (
+              {leads.map((lead: Lead) => (
                 <article key={lead.id} className="crm-lead-card">
                   <div className="crm-lead-top">
                     <div>
