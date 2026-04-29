@@ -899,6 +899,11 @@ h3 {
   margin-top: 24px;
 }
 
+.form-footer .button {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 .mini-stat-grid {
   gap: 14px;
   margin-top: 22px;
