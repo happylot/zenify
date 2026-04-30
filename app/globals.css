@@ -707,6 +707,75 @@ h3 {
   width: calc(33.333% - 15px);
 }
 
+.solution-editorial-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.solution-spotlight {
+  display: flex;
+  align-items: stretch;
+  gap: 26px;
+}
+
+.solution-spotlight-reverse {
+  flex-direction: row-reverse;
+}
+
+.solution-visual {
+  position: relative;
+  width: min(38%, 420px);
+  min-height: 360px;
+  border-radius: 28px;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(12, 93, 110, 0.24), rgba(223, 246, 245, 0.7));
+  box-shadow: var(--shadow);
+  flex-shrink: 0;
+}
+
+.solution-visual img {
+  object-fit: cover;
+}
+
+.solution-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.solution-copy h2,
+.faq-item h3 {
+  margin: 0;
+}
+
+.solution-copy p,
+.faq-item p {
+  margin: 0;
+}
+
+.solution-bullets {
+  margin: 6px 0 0;
+  padding-left: 20px;
+}
+
+.solution-bullets li + li {
+  margin-top: 8px;
+}
+
+.faq-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 24px;
+}
+
+.faq-item {
+  padding: 20px 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.55);
+}
+
 .card-link {
   display: inline-block;
   margin-top: 18px;
@@ -1547,7 +1616,9 @@ h3 {
   .form-layout,
   .billing-layout,
   .paypal-layout,
-  .three-col-grid {
+  .three-col-grid,
+  .solution-spotlight,
+  .solution-spotlight-reverse {
     flex-direction: column;
   }
 
@@ -1584,6 +1655,15 @@ h3 {
   .ops-metric-grid,
   .ops-grid,
   .ops-automation-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .solution-visual {
+    width: 100%;
+    min-height: 280px;
+  }
+
+  .faq-grid {
     grid-template-columns: 1fr;
   }
 }
