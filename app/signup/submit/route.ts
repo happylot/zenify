@@ -32,7 +32,15 @@ export async function POST(request: NextRequest) {
         `Primary goal: ${lead.primaryGoal}`,
         `Created: ${lead.createdAt.toISOString()}`,
       ].join("\n"),
-    ).catch(() => {});
+    )
+      .then((result) => {
+        if (!result.ok) {
+          console.error(`[signup] Telegram notification failed for ${lead.email}: ${result.reason}`);
+        }
+      })
+      .catch((error) => {
+        console.error("[signup] Telegram notification crashed", error);
+      });
 
     const url = buildPublicUrl(request, "/billing");
     url.searchParams.set("signup", "created");

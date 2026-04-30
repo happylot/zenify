@@ -21,6 +21,16 @@ function toHex(buffer: ArrayBuffer) {
     .join("");
 }
 
+function toBase64Url(value: string) {
+  return btoa(value).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function fromBase64Url(value: string) {
+  const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
+  const padding = "=".repeat((4 - (normalized.length % 4 || 4)) % 4);
+  return atob(`${normalized}${padding}`);
+}
+
 async function signValue(value: string, secret: string) {
   const encoder = new TextEncoder();
   const key = await crypto.subtle.importKey(
@@ -94,7 +104,7 @@ export async function createAdminSessionToken(email: string) {
     email,
     exp: String(Date.now() + ttlSeconds * 1000),
   }).toString();
-  const encodedPayload = encodeURIComponent(payload);
+  const encodedPayload = toBase64Url(payload);
   const signature = await signValue(encodedPayload, secret);
 
   return `${encodedPayload}.${signature}`;
@@ -123,7 +133,7 @@ export async function verifyAdminSessionToken(token?: string | null): Promise<Ad
     return null;
   }
 
-  const payload = new URLSearchParams(decodeURIComponent(encodedPayload));
+  const payload = new URLSearchParams(fromBase64Url(encodedPayload));
   const email = payload.get("email");
   const exp = Number(payload.get("exp"));
 

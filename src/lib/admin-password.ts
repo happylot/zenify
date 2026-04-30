@@ -6,7 +6,12 @@ const SCRYPT_PREFIX = "scrypt";
 const KEY_LENGTH = 64;
 
 function parsePasswordHash(hash: string) {
-  const [algorithm, salt, derivedKey] = hash.split("$");
+  const normalizedHash = hash
+    .trim()
+    .replace(/^['"]|['"]$/g, "")
+    .replace(/\\\$/g, "$");
+
+  const [algorithm, salt, derivedKey] = normalizedHash.split("$");
 
   if (algorithm !== SCRYPT_PREFIX || !salt || !derivedKey) {
     throw new Error("Invalid ADMIN_PASSWORD_HASH format. Use npm run admin:hash to generate one.");

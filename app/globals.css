@@ -894,6 +894,13 @@ h3 {
   outline: none;
 }
 
+.form-grid input:focus,
+.form-grid select:focus,
+.admin-auth-form input:focus {
+  border-color: rgba(10, 160, 174, 0.42);
+  box-shadow: 0 0 0 4px rgba(10, 160, 174, 0.12);
+}
+
 .form-footer {
   align-items: center;
   justify-content: space-between;
@@ -904,6 +911,92 @@ h3 {
 .form-footer .button {
   flex-shrink: 0;
   white-space: nowrap;
+}
+
+.admin-auth-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px 20px;
+}
+
+.admin-auth-card {
+  width: min(100%, 560px);
+  padding: 42px;
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(13, 111, 137, 0.12);
+  box-shadow: 0 24px 60px rgba(20, 63, 77, 0.14);
+}
+
+.admin-auth-head {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.admin-auth-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.admin-auth-brand strong,
+.admin-auth-brand small {
+  display: block;
+}
+
+.admin-auth-brand strong {
+  font-size: 1rem;
+}
+
+.admin-auth-brand small,
+.admin-auth-copy {
+  color: var(--muted);
+}
+
+.admin-auth-copy {
+  margin-top: 12px;
+  max-width: 40ch;
+}
+
+.admin-auth-error {
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  color: #9f2334;
+  background: rgba(230, 77, 109, 0.12);
+  border: 1px solid rgba(230, 77, 109, 0.12);
+}
+
+.admin-auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.admin-auth-form label span {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.admin-auth-form input {
+  width: 100%;
+  min-height: 54px;
+  padding: 0 16px;
+  color: var(--ink);
+  border: 1px solid rgba(13, 111, 137, 0.14);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  outline: none;
+}
+
+.admin-auth-form .button {
+  width: 100%;
+  margin-top: 6px;
 }
 
 .mini-stat-grid {
@@ -1290,6 +1383,110 @@ h3 {
   margin-top: 14px;
 }
 
+.crm-lead-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.crm-lead-card {
+  padding: 22px;
+  border-radius: 22px;
+  background: rgba(10, 160, 174, 0.05);
+  border: 1px solid rgba(13, 111, 137, 0.1);
+}
+
+.crm-lead-top,
+.crm-meta,
+.crm-actions {
+  display: flex;
+}
+
+.crm-lead-top {
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.crm-lead-top strong,
+.crm-lead-top span,
+.crm-meta span {
+  display: block;
+}
+
+.crm-lead-top > div > span,
+.crm-meta span {
+  color: var(--muted);
+}
+
+.crm-meta {
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  margin: 16px 0 18px;
+}
+
+.crm-actions {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.crm-trial-progress-wrap {
+  margin-top: -6px;
+  margin-bottom: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.crm-trial-progress-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.crm-trial-progress-top span {
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.crm-trial-progress-top strong {
+  color: var(--primary-deep);
+  font-weight: 900;
+  font-size: 0.95rem;
+}
+
+.crm-trial-progress {
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(13, 111, 137, 0.1);
+}
+
+.crm-trial-progress span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-deep));
+}
+
+.crm-action-button {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid rgba(13, 111, 137, 0.14);
+  border-radius: 999px;
+  color: var(--primary-deep);
+  background: rgba(255, 255, 255, 0.92);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.crm-action-button-active {
+  color: white;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-deep) 100%);
+  border-color: transparent;
+}
+
 .site-footer {
   padding: 40px 0 30px;
   color: #dbeff3;
@@ -1461,7 +1658,8 @@ h3 {
   .form-card,
   .summary-card,
   .trial-status-card,
-  .timeline-card {
+  .timeline-card,
+  .admin-auth-card {
     padding: 24px;
   }
 

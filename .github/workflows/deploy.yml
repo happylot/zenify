@@ -27,3 +27,7 @@ jobs:
             npm run build
             npx pm2 startOrReload ecosystem.config.js --update-env
             npx pm2 save
+            cp deploy/nginx/zenify.cx.conf /etc/nginx/sites-available/zenify.cx
+            ln -sfn /etc/nginx/sites-available/zenify.cx /etc/nginx/sites-enabled/zenify.cx
+            nginx -t
+            systemctl reload nginx

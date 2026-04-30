@@ -19,72 +19,54 @@ export default async function AdminLoginPage({
   const hostname = getAdminHost();
 
   return (
-    <section className="section">
-      <div className="container form-layout">
-        <aside className="app-sidebar signup-sidebar">
-          <p className="eyebrow">Admin access</p>
-          <h2>{hostname}</h2>
-          <p className="lead compact">
-            This subdomain is reserved for internal operations such as billing controls, account locks,
-            subscription oversight, and future back-office management.
-          </p>
-          <div className="mini-stat-grid">
-            <article>
-              <strong>Protected</strong>
-              <p>All `/app` pages and `/api/admin` endpoints require an authenticated admin session.</p>
-            </article>
-            <article>
-              <strong>Isolated</strong>
-              <p>Main marketing traffic stays on `zenify.cx`, while admin traffic moves to a separate host.</p>
-            </article>
-          </div>
-        </aside>
-
-        <article className="form-card">
-          <div className="form-card-head">
+    <section className="admin-auth-shell">
+      <div className="admin-auth-card">
+        <div className="admin-auth-head">
+          <div className="admin-auth-brand">
+            <span className="brand-mark">Z</span>
             <div>
-              <p className="eyebrow">Sign in</p>
-              <h2>Zenify admin console</h2>
+              <strong>Zenify Admin</strong>
+              <small>{hostname}</small>
             </div>
           </div>
+          <div>
+            <p className="eyebrow">Sign in</p>
+            <h1>Admin Console</h1>
+            <p className="admin-auth-copy">Sign in with your admin account to access billing and operations.</p>
+          </div>
+        </div>
 
-          {!loginConfigured ? (
-            <div className="paypal-error">
-              Set `ADMIN_HOST`, `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`, and `ADMIN_SESSION_SECRET`
-              before using this login page.
-            </div>
-          ) : null}
+        {!loginConfigured ? (
+          <div className="admin-auth-error">
+            Set `ADMIN_HOST`, `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`, and `ADMIN_SESSION_SECRET`
+            before using this login page.
+          </div>
+        ) : null}
 
-          {errorParam && loginMessages[errorParam] ? (
-            <div className="paypal-error">{loginMessages[errorParam]}</div>
-          ) : null}
+        {errorParam && loginMessages[errorParam] ? (
+          <div className="admin-auth-error">{loginMessages[errorParam]}</div>
+        ) : null}
 
-          <form action="/admin/login/submit" method="post">
-            <div className="form-grid">
-              <label className="form-span-2">
-                <span>Admin email</span>
-                <input type="email" name="email" autoComplete="email" required placeholder="ops@zenify.cx" />
-              </label>
-              <label className="form-span-2">
-                <span>Password</span>
-                <input
-                  type="password"
-                  name="password"
-                  autoComplete="current-password"
-                  required
-                  placeholder="Enter your admin password"
-                />
-              </label>
-            </div>
-            <input type="hidden" name="next" value={nextPath || getAdminHomePath()} />
-            <div className="form-footer">
-              <p className="lead compact">Use your provisioned admin account to continue into the internal workspace.</p>
-              <button type="submit" className="button" disabled={!loginConfigured}>
-                Enter admin console
-              </button>
-            </div>
-          </form>
-        </article>
+        <form action="/admin/login/submit" method="post" className="admin-auth-form">
+          <label>
+            <span>Admin email</span>
+            <input type="email" name="email" autoComplete="email" required placeholder="admin@zenify.cx" />
+          </label>
+          <label>
+            <span>Password</span>
+            <input
+              type="password"
+              name="password"
+              autoComplete="current-password"
+              required
+              placeholder="Enter your password"
+            />
+          </label>
+          <input type="hidden" name="next" value={nextPath || getAdminHomePath()} />
+          <button type="submit" className="button" disabled={!loginConfigured}>
+            Sign in
+          </button>
+        </form>
       </div>
     </section>
   );

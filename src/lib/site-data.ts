@@ -493,6 +493,7 @@ export const helpItems: HelpItem[] = [
 
 export const appAreas = [
   { href: "/app", label: "Overview" },
+  { href: "/app/crm", label: "CRM" },
   { href: "/app/dashboard", label: "Dashboard" },
   { href: "/app/inbox", label: "Inbox" },
   { href: "/app/automation", label: "Automation" },

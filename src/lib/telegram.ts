@@ -26,10 +26,13 @@ export async function sendTelegramMessage(text: string): Promise<TelegramSendRes
   });
 
   if (!res.ok) {
-    console.error(`[telegram] sendMessage failed: ${res.status}`);
-    return { ok: false, reason: `Telegram request failed: ${res.status}` };
+    const body = await res.text().catch(() => "");
+    const reason = body
+      ? `Telegram request failed: ${res.status} ${res.statusText} - ${body}`
+      : `Telegram request failed: ${res.status} ${res.statusText}`;
+    console.error(`[telegram] ${reason}`);
+    return { ok: false, reason };
   }
 
   return { ok: true };
 }
-
