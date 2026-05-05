@@ -88,6 +88,10 @@ model SignupLead {
   workspaceSlug   String           @unique
   teamSize        String
   primaryGoal     String
+  planCode        PlanCode?
+  seats           Int?
+  billingCycle    String?
+  paypalOrderId   String?
   source          String           @default("website-signup")
   status          SignupLeadStatus @default(NEW)
   notes           String?

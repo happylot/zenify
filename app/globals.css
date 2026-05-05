@@ -135,6 +135,17 @@ p {
   letter-spacing: 0.02em;
 }
 
+.brand-name {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
 .brand-mark {
   width: 40px;
   height: 40px;
@@ -1130,15 +1141,60 @@ h3 {
 }
 
 .paypal-box {
-  margin-top: 20px;
+  margin: 20px auto 0;
+  width: 360px;
+  max-width: 100%;
+}
+
+.paypal-box > div {
+  width: 100% !important;
+}
+
+.paypal-success-panel {
+  margin: 20px auto 0;
+  padding: 28px 24px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(21, 179, 124, 0.08), rgba(10, 160, 174, 0.06));
+  border: 1px solid rgba(21, 179, 124, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  max-width: 520px;
+  text-align: center;
+}
+
+.paypal-success-panel strong {
+  font-size: 1.15rem;
+  color: #0f7f62;
+}
+
+.paypal-success-panel p {
+  margin: 0;
+  color: var(--ink-muted, #45556a);
+  line-height: 1.55;
+}
+
+.paypal-success-panel code {
+  background: rgba(15, 127, 98, 0.1);
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 0.95em;
+}
+
+.paypal-success-panel .button {
+  align-self: center;
+  margin-top: 8px;
 }
 
 .paypal-placeholder,
 .paypal-success,
 .paypal-error {
-  margin-top: 14px;
+  margin: 14px auto 0;
   padding: 14px 16px;
   border-radius: 16px;
+  max-width: 420px;
+  text-align: center;
 }
 
 .paypal-placeholder {

@@ -1,4 +1,6 @@
+import { PlanCode } from "@prisma/client";
 import { db } from "@/lib/db";
+import { isSelfServePlan, type SelfServePlanCode } from "@/lib/site-data";
 
 const SIGNUP_LEAD_STATUSES = ["NEW", "CONTACTED", "QUALIFIED", "CONVERTED", "DISQUALIFIED"] as const;
 type SignupLeadStatus = (typeof SIGNUP_LEAD_STATUSES)[number];
@@ -27,6 +29,9 @@ export async function createSignupLead(input: {
   workspaceSlug: string;
   teamSize: string;
   primaryGoal: string;
+  planCode: SelfServePlanCode;
+  seats: number;
+  billingCycle?: string;
 }) {
   const email = normalizeEmail(input.email);
   const company = input.company.trim();
@@ -36,6 +41,16 @@ export async function createSignupLead(input: {
     throw new Error("Missing signup fields");
   }
 
+  if (!isSelfServePlan(input.planCode)) {
+    throw new Error("Invalid plan");
+  }
+
+  if (!Number.isInteger(input.seats) || input.seats < 1 || input.seats > 1000) {
+    throw new Error("Invalid seats");
+  }
+
+  const planCode = input.planCode as PlanCode;
+
   return db.signupLead.upsert({
     where: { email },
     update: {
@@ -43,6 +58,10 @@ export async function createSignupLead(input: {
       workspaceSlug,
       teamSize: input.teamSize,
       primaryGoal: input.primaryGoal,
+      planCode,
+      seats: input.seats,
+      billingCycle: input.billingCycle ?? "monthly",
+      paypalOrderId: null,
       source: "website-signup",
       status: "NEW" as any,
       notes: null,
@@ -55,7 +74,31 @@ export async function createSignupLead(input: {
       workspaceSlug,
       teamSize: input.teamSize,
       primaryGoal: input.primaryGoal,
+      planCode,
+      seats: input.seats,
+      billingCycle: input.billingCycle ?? "monthly",
       source: "website-signup",
+    },
+  });
+}
+
+export async function getSignupLeadById(id: string) {
+  return db.signupLead.findUnique({ where: { id } });
+}
+
+export async function attachPaypalOrderToLead(leadId: string, paypalOrderId: string) {
+  return db.signupLead.update({
+    where: { id: leadId },
+    data: { paypalOrderId },
+  });
+}
+
+export async function markSignupLeadConverted(leadId: string) {
+  return db.signupLead.update({
+    where: { id: leadId },
+    data: {
+      status: "CONVERTED" as any,
+      convertedAt: new Date(),
     },
   });
 }

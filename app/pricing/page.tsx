@@ -59,30 +59,35 @@ export default function PricingPage() {
             </button>
           </div>
           <div className="pricing-grid">
-            {plans.map((plan) => (
-              <article
-                key={plan.name}
-                className={`pricing-card ${plan.highlighted ? "pricing-card-featured" : ""}`}
-              >
-                {plan.highlighted ? <div className="pricing-badge">Most Popular</div> : null}
-                <h3>{plan.name}</h3>
-                <p className="pricing-seat">{plan.seats}</p>
-                <div className="price-stack">
-                  <strong>{plan.displayPrice}</strong>
-                  <span>per seat / month</span>
-                  <small>{plan.billingNote}</small>
-                </div>
-                <p>{plan.description}</p>
-                <ul>
-                  {plan.bullets.map((bullet) => (
-                    <li key={bullet}>{bullet}</li>
-                  ))}
-                </ul>
-                <Link href="/signup" className="button button-small">
-                  {plan.cta}
-                </Link>
-              </article>
-            ))}
+            {plans.map((plan) => {
+              const isEnterprise = plan.name.toLowerCase() === "enterprise";
+              const ctaHref = isEnterprise ? "/contact" : `/signup?plan=${plan.name.toLowerCase()}`;
+
+              return (
+                <article
+                  key={plan.name}
+                  className={`pricing-card ${plan.highlighted ? "pricing-card-featured" : ""}`}
+                >
+                  {plan.highlighted ? <div className="pricing-badge">Most Popular</div> : null}
+                  <h3>{plan.name}</h3>
+                  <p className="pricing-seat">{plan.seats}</p>
+                  <div className="price-stack">
+                    <strong>{plan.displayPrice}</strong>
+                    <span>per seat / month</span>
+                    <small>{plan.billingNote}</small>
+                  </div>
+                  <p>{plan.description}</p>
+                  <ul>
+                    {plan.bullets.map((bullet) => (
+                      <li key={bullet}>{bullet}</li>
+                    ))}
+                  </ul>
+                  <Link href={ctaHref} className="button button-small">
+                    {plan.cta}
+                  </Link>
+                </article>
+              );
+            })}
           </div>
         </div>
       </section>

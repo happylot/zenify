@@ -1,11 +1,27 @@
-import Link from "next/link";
 import { PageHero } from "@/components/page-hero";
-import { signupChecklist } from "@/lib/site-data";
+import {
+  PLAN_DEFAULT_SEATS,
+  PLAN_PRICES,
+  SELF_SERVE_PLANS,
+  planCodeFromQuery,
+  planDisplayName,
+  signupChecklist,
+  type SelfServePlanCode,
+} from "@/lib/site-data";
 
 const signupMessages: Record<string, string> = {
   "Missing signup fields": "Please complete all fields before continuing.",
   "Unable to save signup": "We could not save your signup right now. Please try again.",
+  "Invalid plan": "Please choose Starter, Growth, or Business.",
+  "Invalid seats": "Seat count must be between 1 and 1000.",
+  "Invalid email": "Enter a valid work email address.",
+  "Invalid company name": "Company name must be 2-100 characters.",
+  "enterprise-contact-sales": "Enterprise plans are sold via our sales team. Please use the contact form.",
+  "session-expired": "Your signup session expired. Please fill the form again.",
+  "internal-error": "Something went wrong on our side. Please try again in a moment.",
 };
+
+const FALLBACK_ERROR_MESSAGE = "Something went wrong. Please try again.";
 
 export default async function SignupPage({
   searchParams,
@@ -14,6 +30,9 @@ export default async function SignupPage({
 }) {
   const params = await searchParams;
   const errorParam = Array.isArray(params.error) ? params.error[0] : params.error;
+  const planParam = Array.isArray(params.plan) ? params.plan[0] : params.plan;
+  const preselectedPlan: SelfServePlanCode = planCodeFromQuery(planParam) ?? "GROWTH";
+  const defaultSeats = PLAN_DEFAULT_SEATS[preselectedPlan];
 
   return (
     <main>
@@ -49,8 +68,10 @@ export default async function SignupPage({
               <h2>Create your workspace</h2>
               <span>Step 1 of 3</span>
             </div>
-            {errorParam && signupMessages[errorParam] ? (
-              <div className="admin-auth-error">{signupMessages[errorParam]}</div>
+            {errorParam ? (
+              <div className="admin-auth-error">
+                {signupMessages[errorParam] ?? FALLBACK_ERROR_MESSAGE}
+              </div>
             ) : null}
             <form action="/signup/submit" method="post">
               <div className="form-grid">
@@ -65,6 +86,27 @@ export default async function SignupPage({
                 <label>
                   <span>Workspace URL</span>
                   <input type="text" name="workspaceSlug" placeholder="acme.zenify.cx" required />
+                </label>
+                <label>
+                  <span>Plan</span>
+                  <select name="planCode" defaultValue={preselectedPlan}>
+                    {SELF_SERVE_PLANS.map((code) => (
+                      <option key={code} value={code}>
+                        {planDisplayName(code)} — ${PLAN_PRICES[code]}/seat/month
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  <span>Seats</span>
+                  <input
+                    type="number"
+                    name="seats"
+                    min={1}
+                    max={1000}
+                    defaultValue={defaultSeats}
+                    required
+                  />
                 </label>
                 <label>
                   <span>Team size</span>

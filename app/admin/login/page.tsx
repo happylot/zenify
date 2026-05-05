@@ -1,5 +1,7 @@
 import { getAdminHost, getAdminHomePath, normalizeNextPath } from "@/lib/admin-auth";
 import { isAdminLoginConfigured } from "@/lib/admin-password";
+import { roboto } from "@/lib/fonts";
+import { ZenifyLogo } from "@/components/zenify-logo";
 
 const loginMessages: Record<string, string> = {
   invalid: "Incorrect email or password.",
@@ -23,9 +25,9 @@ export default async function AdminLoginPage({
       <div className="admin-auth-card">
         <div className="admin-auth-head">
           <div className="admin-auth-brand">
-            <span className="brand-mark">Z</span>
+            <ZenifyLogo />
             <div>
-              <strong>Zenify Admin</strong>
+              <strong className={`brand-name ${roboto.className}`}>Zenify Admin</strong>
               <small>{hostname}</small>
             </div>
           </div>

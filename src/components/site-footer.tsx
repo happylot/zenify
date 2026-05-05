@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { roboto } from "@/lib/fonts";
+import { ZenifyLogo } from "@/components/zenify-logo";
 
 const footerGroups = [
   {
@@ -36,8 +38,8 @@ export function SiteFooter() {
       <div className="container footer-grid">
         <div>
           <Link href="/" className="brand footer-brand">
-            <span className="brand-mark">Z</span>
-            <span>Zenify</span>
+            <ZenifyLogo />
+            <span className={`brand-name ${roboto.className}`}>Zenify</span>
           </Link>
           <p className="footer-copy">
             Zenify.cx is positioned as a leading omnichannel CXM SaaS for businesses of every size,

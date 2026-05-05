@@ -1,6 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSignupLead } from "@/lib/crm";
+import {
+  SIGNUP_SESSION_COOKIE,
+  createSignupSessionToken,
+  getSignupSessionCookieOptions,
+} from "@/lib/signup-session";
+import { isSelfServePlan } from "@/lib/site-data";
 import { sendTelegramMessage } from "@/lib/telegram";
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const KNOWN_VALIDATION_REASONS = new Set([
+  "Missing signup fields",
+  "Invalid plan",
+  "Invalid seats",
+  "Invalid email",
+  "Invalid company name",
+  "enterprise-contact-sales",
+  "session-expired",
+]);
 
 function buildPublicUrl(request: NextRequest, pathname: string) {
   const forwardedHost = request.headers.get("x-forwarded-host");
@@ -9,25 +27,63 @@ function buildPublicUrl(request: NextRequest, pathname: string) {
   return new URL(pathname, `${protocol}://${host}`);
 }
 
+function redirectWithError(request: NextRequest, reason: string) {
+  const url = buildPublicUrl(request, "/signup");
+  url.searchParams.set("error", reason);
+  return NextResponse.redirect(url, 303);
+}
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
 
+    const email = String(formData.get("email") ?? "").trim();
+    const company = String(formData.get("company") ?? "").trim();
+    const workspaceSlug = String(formData.get("workspaceSlug") ?? "").trim();
+    const teamSize = String(formData.get("teamSize") ?? "").trim();
+    const primaryGoal = String(formData.get("primaryGoal") ?? "").trim();
+    const planCodeRaw = String(formData.get("planCode") ?? "").trim().toUpperCase();
+    const seatsRaw = String(formData.get("seats") ?? "").trim();
+
+    if (!EMAIL_RE.test(email)) {
+      return redirectWithError(request, "Invalid email");
+    }
+
+    if (company.length < 2 || company.length > 100) {
+      return redirectWithError(request, "Invalid company name");
+    }
+
+    if (planCodeRaw === "ENTERPRISE") {
+      return redirectWithError(request, "enterprise-contact-sales");
+    }
+
+    if (!isSelfServePlan(planCodeRaw)) {
+      return redirectWithError(request, "Invalid plan");
+    }
+
+    const seats = Number.parseInt(seatsRaw, 10);
+    if (!Number.isFinite(seats) || seats < 1 || seats > 1000) {
+      return redirectWithError(request, "Invalid seats");
+    }
+
     const lead = await createSignupLead({
-      email: String(formData.get("email") ?? ""),
-      company: String(formData.get("company") ?? ""),
-      workspaceSlug: String(formData.get("workspaceSlug") ?? ""),
-      teamSize: String(formData.get("teamSize") ?? ""),
-      primaryGoal: String(formData.get("primaryGoal") ?? ""),
+      email,
+      company,
+      workspaceSlug,
+      teamSize,
+      primaryGoal,
+      planCode: planCodeRaw,
+      seats,
+      billingCycle: "monthly",
     });
 
-    // Best-effort: Telegram failure should not block signup->billing flow.
     void sendTelegramMessage(
       [
         "New Zenify signup lead",
         `Email: ${lead.email}`,
         `Company: ${lead.company}`,
-        `Workspace: ${lead.workspaceSlug}.zenify.cx`,
+        `Workspace: ${lead.workspaceSlug}`,
+        `Plan: ${lead.planCode} × ${lead.seats} seats`,
         `Team size: ${lead.teamSize}`,
         `Primary goal: ${lead.primaryGoal}`,
         `Created: ${lead.createdAt.toISOString()}`,
@@ -43,11 +99,15 @@ export async function POST(request: NextRequest) {
       });
 
     const url = buildPublicUrl(request, "/billing");
-    url.searchParams.set("signup", "created");
-    return NextResponse.redirect(url);
+    const response = NextResponse.redirect(url, 303);
+    response.cookies.set(SIGNUP_SESSION_COOKIE, createSignupSessionToken(lead.id), getSignupSessionCookieOptions());
+    return response;
   } catch (error) {
-    const url = buildPublicUrl(request, "/signup");
-    url.searchParams.set("error", error instanceof Error ? error.message : "Unable to save signup");
-    return NextResponse.redirect(url);
+    const message = error instanceof Error ? error.message : "Unable to save signup";
+    if (KNOWN_VALIDATION_REASONS.has(message)) {
+      return redirectWithError(request, message);
+    }
+    console.error("[signup/submit] internal error", error);
+    return redirectWithError(request, "internal-error");
   }
 }

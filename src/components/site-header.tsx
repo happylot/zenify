@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { primaryNav } from "@/lib/site-data";
+import { roboto } from "@/lib/fonts";
+import { ZenifyLogo } from "@/components/zenify-logo";
 
 export function SiteHeader() {
   return (
     <header className="site-header">
       <div className="container nav-shell">
         <Link href="/" className="brand">
-          <span className="brand-mark">Z</span>
-          <span>Zenify</span>
+          <ZenifyLogo />
+          <span className={`brand-name ${roboto.className}`}>Zenify</span>
         </Link>
         <nav className="main-nav">
           {primaryNav.map((item) => (

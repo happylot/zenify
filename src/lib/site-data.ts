@@ -48,6 +48,45 @@ export type PricingPlan = {
   bullets: string[];
 };
 
+export type SelfServePlanCode = "STARTER" | "GROWTH" | "BUSINESS";
+export type PlanCode = SelfServePlanCode | "ENTERPRISE";
+
+export const PLAN_PRICES: Record<SelfServePlanCode, number> = {
+  STARTER: 25,
+  GROWTH: 39,
+  BUSINESS: 65,
+};
+
+export const PLAN_DEFAULT_SEATS: Record<SelfServePlanCode, number> = {
+  STARTER: 2,
+  GROWTH: 10,
+  BUSINESS: 25,
+};
+
+export const SELF_SERVE_PLANS: SelfServePlanCode[] = ["STARTER", "GROWTH", "BUSINESS"];
+
+export function isSelfServePlan(value: string): value is SelfServePlanCode {
+  return (SELF_SERVE_PLANS as readonly string[]).includes(value);
+}
+
+export function planCodeFromQuery(value: string | undefined | null): SelfServePlanCode | null {
+  if (!value) return null;
+  const upper = value.toUpperCase();
+  return isSelfServePlan(upper) ? upper : null;
+}
+
+export function planDisplayName(code: SelfServePlanCode) {
+  return code.charAt(0) + code.slice(1).toLowerCase();
+}
+
+export function getPlanPrice(code: SelfServePlanCode) {
+  return PLAN_PRICES[code];
+}
+
+export function computeTotal(code: SelfServePlanCode, seats: number) {
+  return PLAN_PRICES[code] * seats;
+}
+
 export type BillingMetric = {
   label: string;
   value: string;
@@ -505,8 +544,8 @@ export const appAreas = [
 export const pricingPlans: PricingPlan[] = [
   {
     name: "Starter",
-    monthlyPrice: "$29",
-    annualPrice: "$24",
+    monthlyPrice: "$25",
+    annualPrice: "$21",
     description: "For small teams starting with live support and structured customer conversations.",
     seats: "2 agent seats",
     cta: "Start Starter trial",
@@ -514,8 +553,8 @@ export const pricingPlans: PricingPlan[] = [
   },
   {
     name: "Growth",
-    monthlyPrice: "$79",
-    annualPrice: "$65",
+    monthlyPrice: "$39",
+    annualPrice: "$32",
     description: "For scaling service and sales teams that need automation and customer visibility.",
     seats: "10 agent seats",
     cta: "Start Growth trial",
@@ -524,8 +563,8 @@ export const pricingPlans: PricingPlan[] = [
   },
   {
     name: "Business",
-    monthlyPrice: "$149",
-    annualPrice: "$129",
+    monthlyPrice: "$65",
+    annualPrice: "$53",
     description: "For high-volume teams that need AI operations, coaching, and service governance.",
     seats: "25 agent seats",
     cta: "Start Business trial",

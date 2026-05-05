@@ -1,67 +1,83 @@
-import Link from "next/link";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { PageHero } from "@/components/page-hero";
-import { PaypalCheckout } from "@/components/paypal-checkout";
-import { billingChecklist, pricingPlans } from "@/lib/site-data";
+import { BillingCheckout } from "@/components/billing-checkout";
+import { getSignupLeadById } from "@/lib/crm";
+import { SIGNUP_SESSION_COOKIE, readSignupSessionToken } from "@/lib/signup-session";
+import {
+  PLAN_PRICES,
+  billingChecklist,
+  isSelfServePlan,
+  planDisplayName,
+  type SelfServePlanCode,
+} from "@/lib/site-data";
 
-export default function BillingPage() {
-  const growthPlan = pricingPlans.find((plan) => plan.name === "Growth");
+export const dynamic = "force-dynamic";
+
+export default async function BillingPage() {
+  const store = await cookies();
+  const token = store.get(SIGNUP_SESSION_COOKIE)?.value;
+  const session = readSignupSessionToken(token);
+
+  if (!session) {
+    redirect("/signup?error=session-expired");
+  }
+
+  const lead = await getSignupLeadById(session.leadId);
+
+  if (!lead || !lead.planCode || !isSelfServePlan(lead.planCode) || !lead.seats) {
+    redirect("/signup?error=session-expired");
+  }
+
+  const planCode = lead.planCode as SelfServePlanCode;
+  const seats = lead.seats!;
+  const pricePerSeat = PLAN_PRICES[planCode];
+  const total = pricePerSeat * seats;
 
   return (
     <main>
       <PageHero
         eyebrow="Billing"
-        title="Card capture before trial access"
-        description="The billing step is intentionally placed before activation so the product can convert trial users into subscribers without account fragmentation."
+        title="Confirm your plan and pay with PayPal"
+        description="Approve the payment with PayPal to provision your workspace. Login credentials will be sent to your email."
       />
       <section className="section section-tight">
         <div className="container billing-layout">
           <article className="form-card">
             <div className="form-card-head">
-              <h2>Billing information</h2>
+              <h2>Payment</h2>
               <span>Step 2 of 3</span>
             </div>
-            <div className="form-grid">
-              <label className="form-span-2">
-                <span>Name on card</span>
-                <input type="text" placeholder="Alex Nguyen" />
-              </label>
-              <label className="form-span-2">
-                <span>Card number</span>
-                <input type="text" placeholder="4242 4242 4242 4242" />
-              </label>
-              <label>
-                <span>Expiry</span>
-                <input type="text" placeholder="08 / 29" />
-              </label>
-              <label>
-                <span>CVC</span>
-                <input type="text" placeholder="123" />
-              </label>
-              <label className="form-span-2">
-                <span>Billing country</span>
-                <select defaultValue="Vietnam">
-                  <option>Vietnam</option>
-                  <option>Singapore</option>
-                  <option>United States</option>
-                  <option>United Kingdom</option>
-                </select>
-              </label>
-            </div>
+            <p>
+              Click <strong>PayPal</strong> below to approve the charge. The workspace is created automatically once
+              payment is captured.
+            </p>
+            <BillingCheckout />
             <div className="secure-note">
               <span className="secure-dot" />
-              <p>Card setup is used to start the 15-day trial and convert seamlessly into a paid plan.</p>
+              <p>Pay-now: charged immediately upon approval. Refunds are handled by Zenify support.</p>
             </div>
           </article>
 
           <article className="checkout-summary">
             <div className="summary-card">
               <p className="eyebrow">Selected plan</p>
-              <h2>{growthPlan?.name ?? "Growth"}</h2>
+              <h2>{planDisplayName(planCode)}</h2>
               <div className="summary-price">
-                <strong>{growthPlan?.monthlyPrice ?? "$79"}</strong>
+                <strong>${pricePerSeat}</strong>
                 <span>per seat / month</span>
               </div>
-              <p>{growthPlan?.description}</p>
+              <ul>
+                <li>
+                  <strong>{seats}</strong> seats
+                </li>
+                <li>
+                  Workspace: <strong>{lead.workspaceSlug}</strong>
+                </li>
+                <li>
+                  Email: <strong>{lead.email}</strong>
+                </li>
+              </ul>
               <ul>
                 {billingChecklist.map((item) => (
                   <li key={item}>{item}</li>
@@ -69,47 +85,15 @@ export default function BillingPage() {
               </ul>
               <div className="summary-totals">
                 <div>
-                  <span>Trial today</span>
-                  <strong>$0.00</strong>
+                  <span>Charged today</span>
+                  <strong>${total.toLocaleString("en-US")}</strong>
                 </div>
                 <div>
-                  <span>After 15 days</span>
-                  <strong>{growthPlan?.monthlyPrice ?? "$79"} / seat</strong>
+                  <span>Renews monthly</span>
+                  <strong>${total.toLocaleString("en-US")}</strong>
                 </div>
               </div>
-              <Link href="/trial" className="button">
-                Start 15-day trial
-              </Link>
             </div>
-          </article>
-        </div>
-      </section>
-
-      <section className="section section-tight tint">
-        <div className="container paypal-layout">
-          <article className="detail-card">
-            <p className="eyebrow">PayPal Checkout</p>
-            <h2>Pay the first month now with PayPal</h2>
-            <p>
-              Use this path when the customer wants to skip trial-style card capture and go straight
-              to a paid Growth plan checkout.
-            </p>
-            <ul>
-              <li>Creates a PayPal order from a secure server route.</li>
-              <li>Captures the approved payment on the server after buyer approval.</li>
-              <li>Keeps `client ID` public on the client and `client secret` only on the server.</li>
-            </ul>
-          </article>
-
-          <article className="summary-card paypal-summary">
-            <p className="eyebrow">Growth plan checkout</p>
-            <h2>{growthPlan?.monthlyPrice ?? "$79.00"}</h2>
-            <p>First month for one seat, billed in USD via PayPal.</p>
-            <PaypalCheckout
-              amount={(growthPlan?.monthlyPrice ?? "$79").replace("$", "")}
-              currency="USD"
-              description="Zenify Growth plan - first month"
-            />
           </article>
         </div>
       </section>
