@@ -78,12 +78,19 @@ export function BillingCheckout() {
             setError(null);
             setIsPending(true);
             try {
-              const subscriptionId = await startCheckout();
-              return subscriptionId;
-            } catch (err) {
-              const message = err instanceof Error ? err.message : "Unable to start checkout.";
-              setError(message);
-              throw err;
+              const result = await startCheckout();
+              if (!result.ok) {
+                let message = result.message;
+                if (result.statusCode === 409 && result.conflictField) {
+                  message =
+                    result.conflictField === "email"
+                      ? "Email is already in use. Please go back and use another."
+                      : "Workspace slug is already in use. Please go back and pick another.";
+                }
+                setError(message);
+                throw new Error(message);
+              }
+              return result.paypalSubscriptionId;
             } finally {
               setIsPending(false);
             }
