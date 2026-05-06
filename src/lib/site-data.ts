@@ -48,14 +48,19 @@ export type PricingPlan = {
   bullets: string[];
 };
 
-export type SelfServePlanCode = "STARTER" | "GROWTH" | "BUSINESS";
+export type SelfServePlanCode = "TRIAL" | "STARTER" | "GROWTH" | "BUSINESS";
 export type PlanCode = SelfServePlanCode | "ENTERPRISE";
 
 export const PLAN_PRICES: Record<SelfServePlanCode, number> = {
+  TRIAL: 0.2,
   STARTER: 25,
   GROWTH: 39,
   BUSINESS: 65,
 };
+
+export function formatPlanPrice(value: number) {
+  return Number.isInteger(value) ? `$${value}` : `$${value.toFixed(2)}`;
+}
 
 export const SEAT_SIZES = [5, 10, 20, 50, 100, 200, 500] as const;
 export type SeatSize = (typeof SEAT_SIZES)[number];
@@ -65,12 +70,13 @@ export function isValidSeatSize(value: number): value is SeatSize {
 }
 
 export const PLAN_DEFAULT_SEATS: Record<SelfServePlanCode, SeatSize> = {
+  TRIAL: 5,
   STARTER: 5,
   GROWTH: 10,
   BUSINESS: 20,
 };
 
-export const SELF_SERVE_PLANS: SelfServePlanCode[] = ["STARTER", "GROWTH", "BUSINESS"];
+export const SELF_SERVE_PLANS: SelfServePlanCode[] = ["TRIAL", "STARTER", "GROWTH", "BUSINESS"];
 
 export function isSelfServePlan(value: string): value is SelfServePlanCode {
   return (SELF_SERVE_PLANS as readonly string[]).includes(value);

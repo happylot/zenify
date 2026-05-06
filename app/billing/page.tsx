@@ -7,6 +7,7 @@ import { SIGNUP_SESSION_COOKIE, readSignupSessionToken } from "@/lib/signup-sess
 import {
   PLAN_PRICES,
   billingChecklist,
+  formatPlanPrice,
   isSelfServePlan,
   planDisplayName,
   type SelfServePlanCode,
@@ -64,7 +65,7 @@ export default async function BillingPage() {
               <p className="eyebrow">Selected plan</p>
               <h2>{planDisplayName(planCode)}</h2>
               <div className="summary-price">
-                <strong>${pricePerSeat}</strong>
+                <strong>{formatPlanPrice(pricePerSeat)}</strong>
                 <span>per seat / month</span>
               </div>
               <ul>
@@ -86,11 +87,11 @@ export default async function BillingPage() {
               <div className="summary-totals">
                 <div>
                   <span>Charged today</span>
-                  <strong>${total.toLocaleString("en-US")}</strong>
+                  <strong>{formatPlanPrice(total)}</strong>
                 </div>
                 <div>
                   <span>Renews monthly</span>
-                  <strong>${total.toLocaleString("en-US")}</strong>
+                  <strong>{formatPlanPrice(total)}</strong>
                 </div>
               </div>
             </div>

@@ -4,6 +4,7 @@ import {
   PLAN_PRICES,
   SEAT_SIZES,
   SELF_SERVE_PLANS,
+  formatPlanPrice,
   planCodeFromQuery,
   planDisplayName,
   signupChecklist,
@@ -93,7 +94,7 @@ export default async function SignupPage({
                   <select name="planCode" defaultValue={preselectedPlan}>
                     {SELF_SERVE_PLANS.map((code) => (
                       <option key={code} value={code}>
-                        {planDisplayName(code)} — ${PLAN_PRICES[code]}/seat/month
+                        {planDisplayName(code)} — {formatPlanPrice(PLAN_PRICES[code])}/seat/month
                       </option>
                     ))}
                   </select>
