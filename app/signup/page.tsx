@@ -2,6 +2,7 @@ import { PageHero } from "@/components/page-hero";
 import {
   PLAN_DEFAULT_SEATS,
   PLAN_PRICES,
+  SEAT_SIZES,
   SELF_SERVE_PLANS,
   planCodeFromQuery,
   planDisplayName,
@@ -13,7 +14,7 @@ const signupMessages: Record<string, string> = {
   "Missing signup fields": "Please complete all fields before continuing.",
   "Unable to save signup": "We could not save your signup right now. Please try again.",
   "Invalid plan": "Please choose Starter, Growth, or Business.",
-  "Invalid seats": "Seat count must be between 1 and 1000.",
+  "Invalid seats": "Pick one of the available seat sizes (5, 10, 20, 50, 100, 200, 500).",
   "Invalid email": "Enter a valid work email address.",
   "Invalid company name": "Company name must be 2-100 characters.",
   "enterprise-contact-sales": "Enterprise plans are sold via our sales team. Please use the contact form.",
@@ -99,14 +100,13 @@ export default async function SignupPage({
                 </label>
                 <label>
                   <span>Seats</span>
-                  <input
-                    type="number"
-                    name="seats"
-                    min={1}
-                    max={1000}
-                    defaultValue={defaultSeats}
-                    required
-                  />
+                  <select name="seats" defaultValue={defaultSeats}>
+                    {SEAT_SIZES.map((size) => (
+                      <option key={size} value={size}>
+                        {size} seats
+                      </option>
+                    ))}
+                  </select>
                 </label>
                 <label>
                   <span>Team size</span>

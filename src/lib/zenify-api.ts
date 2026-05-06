@@ -1,23 +1,34 @@
 import "server-only";
 
+export type ApiFieldError = { field: string; message: string };
+
 export class ZenifyApiError extends Error {
   statusCode: number;
-  validationErrors?: Array<{ field: string; message: string }>;
+  errors?: ApiFieldError[];
   conflictField?: string;
+  idempotent?: boolean;
+  paypalStatus?: string;
+  currentTier?: string;
 
   constructor(
     message: string,
     statusCode: number,
     options?: {
-      validationErrors?: Array<{ field: string; message: string }>;
+      errors?: ApiFieldError[];
       conflictField?: string;
+      idempotent?: boolean;
+      paypalStatus?: string;
+      currentTier?: string;
     },
   ) {
     super(message);
     this.name = "ZenifyApiError";
     this.statusCode = statusCode;
-    this.validationErrors = options?.validationErrors;
+    this.errors = options?.errors;
     this.conflictField = options?.conflictField;
+    this.idempotent = options?.idempotent;
+    this.paypalStatus = options?.paypalStatus;
+    this.currentTier = options?.currentTier;
   }
 }
 
@@ -29,23 +40,40 @@ function getApiBaseUrl() {
   return base.replace(/\/$/, "");
 }
 
-type EnvelopeSuccess = {
-  error: false;
-  status?: number;
+type EnvelopeBase = {
   statusCode?: number;
+  status?: number;
+  success?: boolean;
+  error?: boolean;
+  message?: string;
+};
+
+type EnvelopeSuccess = EnvelopeBase & {
+  success?: true;
+  error?: false;
   data?: unknown;
 };
 
-type EnvelopeError = {
-  error: true;
-  status?: number;
-  statusCode?: number;
-  message?: string;
-  validationErrors?: Array<{ field: string; message: string }>;
+type EnvelopeError = EnvelopeBase & {
+  success?: false;
+  error?: true;
+  errors?: ApiFieldError[];
+  validationErrors?: ApiFieldError[];
   conflict_field?: string;
+  conflictField?: string;
+  idempotent?: boolean;
+  paypalStatus?: string;
+  current_tier?: string;
+  currentTier?: string;
 };
 
 type Envelope = EnvelopeSuccess | EnvelopeError;
+
+function isErrorEnvelope(env: Envelope): env is EnvelopeError {
+  if (typeof env.success === "boolean") return env.success === false;
+  if (typeof env.error === "boolean") return env.error === true;
+  return false;
+}
 
 export async function callZenifyApi<T = unknown>(
   method: "GET" | "POST",
@@ -64,16 +92,22 @@ export async function callZenifyApi<T = unknown>(
   try {
     json = (await response.json()) as Envelope;
   } catch {
-    throw new ZenifyApiError(`Invalid response from backend (HTTP ${response.status})`, response.status || 502);
+    throw new ZenifyApiError(
+      `Invalid response from backend (HTTP ${response.status})`,
+      response.status || 502,
+    );
   }
 
-  if (json.error) {
+  if (isErrorEnvelope(json)) {
     const statusCode = json.statusCode ?? json.status ?? response.status ?? 500;
     throw new ZenifyApiError(json.message ?? "Request failed", statusCode, {
-      validationErrors: json.validationErrors,
-      conflictField: json.conflict_field,
+      errors: json.errors ?? json.validationErrors,
+      conflictField: json.conflictField ?? json.conflict_field,
+      idempotent: json.idempotent,
+      paypalStatus: json.paypalStatus,
+      currentTier: json.currentTier ?? json.current_tier,
     });
   }
 
-  return (json.data ?? null) as T;
+  return ((json as EnvelopeSuccess).data ?? null) as T;
 }

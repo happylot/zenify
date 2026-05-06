@@ -5,7 +5,7 @@ import {
   createSignupSessionToken,
   getSignupSessionCookieOptions,
 } from "@/lib/signup-session";
-import { isSelfServePlan } from "@/lib/site-data";
+import { isSelfServePlan, isValidSeatSize } from "@/lib/site-data";
 import { sendTelegramMessage } from "@/lib/telegram";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     }
 
     const seats = Number.parseInt(seatsRaw, 10);
-    if (!Number.isFinite(seats) || seats < 1 || seats > 1000) {
+    if (!Number.isFinite(seats) || !isValidSeatSize(seats)) {
       return redirectWithError(request, "Invalid seats");
     }
 

@@ -57,10 +57,17 @@ export const PLAN_PRICES: Record<SelfServePlanCode, number> = {
   BUSINESS: 65,
 };
 
-export const PLAN_DEFAULT_SEATS: Record<SelfServePlanCode, number> = {
-  STARTER: 2,
+export const SEAT_SIZES = [5, 10, 20, 50, 100, 200, 500] as const;
+export type SeatSize = (typeof SEAT_SIZES)[number];
+
+export function isValidSeatSize(value: number): value is SeatSize {
+  return (SEAT_SIZES as readonly number[]).includes(value);
+}
+
+export const PLAN_DEFAULT_SEATS: Record<SelfServePlanCode, SeatSize> = {
+  STARTER: 5,
   GROWTH: 10,
-  BUSINESS: 25,
+  BUSINESS: 20,
 };
 
 export const SELF_SERVE_PLANS: SelfServePlanCode[] = ["STARTER", "GROWTH", "BUSINESS"];

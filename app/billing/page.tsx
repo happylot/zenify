@@ -38,8 +38,8 @@ export default async function BillingPage() {
     <main>
       <PageHero
         eyebrow="Billing"
-        title="Confirm your plan and pay with PayPal"
-        description="Approve the payment with PayPal to provision your workspace. Login credentials will be sent to your email."
+        title="Subscribe with PayPal"
+        description="Approve the subscription with PayPal. PayPal will charge today and auto-renew monthly. Cancel anytime from your PayPal account."
       />
       <section className="section section-tight">
         <div className="container billing-layout">
@@ -49,13 +49,13 @@ export default async function BillingPage() {
               <span>Step 2 of 3</span>
             </div>
             <p>
-              Click <strong>PayPal</strong> below to approve the charge. The workspace is created automatically once
-              payment is captured.
+              Click <strong>PayPal</strong> below to approve your subscription. Your workspace is provisioned
+              automatically once PayPal confirms the subscription.
             </p>
             <BillingCheckout />
             <div className="secure-note">
               <span className="secure-dot" />
-              <p>Pay-now: charged immediately upon approval. Refunds are handled by Zenify support.</p>
+              <p>Auto-renews monthly via PayPal. You can cancel from your PayPal account at any time.</p>
             </div>
           </article>
 

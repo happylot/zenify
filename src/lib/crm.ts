@@ -1,6 +1,6 @@
 import { PlanCode } from "@prisma/client";
 import { db } from "@/lib/db";
-import { isSelfServePlan, type SelfServePlanCode } from "@/lib/site-data";
+import { isSelfServePlan, isValidSeatSize, type SelfServePlanCode } from "@/lib/site-data";
 
 const SIGNUP_LEAD_STATUSES = ["NEW", "CONTACTED", "QUALIFIED", "CONVERTED", "DISQUALIFIED"] as const;
 type SignupLeadStatus = (typeof SIGNUP_LEAD_STATUSES)[number];
@@ -45,7 +45,7 @@ export async function createSignupLead(input: {
     throw new Error("Invalid plan");
   }
 
-  if (!Number.isInteger(input.seats) || input.seats < 1 || input.seats > 1000) {
+  if (!Number.isInteger(input.seats) || !isValidSeatSize(input.seats)) {
     throw new Error("Invalid seats");
   }
 
@@ -61,7 +61,7 @@ export async function createSignupLead(input: {
       planCode,
       seats: input.seats,
       billingCycle: input.billingCycle ?? "monthly",
-      paypalOrderId: null,
+      paypalSubscriptionId: null,
       source: "website-signup",
       status: "NEW" as any,
       notes: null,
@@ -86,10 +86,10 @@ export async function getSignupLeadById(id: string) {
   return db.signupLead.findUnique({ where: { id } });
 }
 
-export async function attachPaypalOrderToLead(leadId: string, paypalOrderId: string) {
+export async function attachPaypalSubscriptionToLead(leadId: string, paypalSubscriptionId: string) {
   return db.signupLead.update({
     where: { id: leadId },
-    data: { paypalOrderId },
+    data: { paypalSubscriptionId },
   });
 }
 

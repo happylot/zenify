@@ -6,13 +6,14 @@ import {
   PayPalScriptProvider,
   type ReactPayPalScriptOptions,
 } from "@paypal/react-paypal-js";
-import { activateSignup, startCheckout } from "../../app/billing/actions";
+import { activateSubscription, startCheckout } from "../../app/billing/actions";
 
 type SuccessState = {
   email: string;
   message: string;
   loginUrl?: string;
   emailSent: boolean;
+  alreadyActive: boolean;
 };
 
 export function BillingCheckout() {
@@ -26,7 +27,8 @@ export function BillingCheckout() {
     return {
       clientId,
       currency: "USD",
-      intent: "capture",
+      intent: "subscription",
+      vault: true,
       components: "buttons",
       locale: "en_US",
     };
@@ -44,7 +46,9 @@ export function BillingCheckout() {
   if (success) {
     return (
       <div className="paypal-success-panel">
-        <strong>Workspace created successfully!</strong>
+        <strong>
+          {success.alreadyActive ? "Subscription already active" : "Subscription created!"}
+        </strong>
         <p>{success.message}</p>
         <p>
           We&apos;ve sent an email to <code>{success.email}</code>. Please check your inbox (including Spam) for login
@@ -69,27 +73,46 @@ export function BillingCheckout() {
       <PayPalScriptProvider options={options}>
         <PayPalButtons
           disabled={isPending}
-          style={{ layout: "vertical", shape: "pill", label: "pay", height: 42 }}
-          createOrder={async () => {
+          style={{ layout: "vertical", shape: "pill", label: "subscribe", height: 42 }}
+          createSubscription={async () => {
             setError(null);
             setIsPending(true);
             try {
-              const result = await startCheckout();
-              if (!result.ok) {
-                setError(result.message);
-                throw new Error(result.message);
-              }
-              return result.paypalOrderId;
+              const subscriptionId = await startCheckout();
+              return subscriptionId;
+            } catch (err) {
+              const message = err instanceof Error ? err.message : "Unable to start checkout.";
+              setError(message);
+              throw err;
             } finally {
               setIsPending(false);
             }
           }}
           onApprove={async (data) => {
+            const subscriptionId = data.subscriptionID ?? "";
+            if (!subscriptionId) {
+              setError("PayPal did not return a subscription ID.");
+              return;
+            }
             setError(null);
             setIsPending(true);
             try {
-              const result = await activateSignup(data.orderID);
+              const result = await activateSubscription(subscriptionId);
               if (!result.ok) {
+                if (result.statusCode === 409 && result.paypalStatus === "APPROVAL_PENDING") {
+                  setError("Approval pending. Please complete the PayPal popup, then click the button again.");
+                  return;
+                }
+                if (result.statusCode === 410) {
+                  setError("Your session expired. Please start over from /signup.");
+                  return;
+                }
+                if (result.statusCode === 409 && result.conflictField) {
+                  setError(
+                    `${result.conflictField === "email" ? "Email" : "Workspace slug"} was just taken. Subscription cancelled and refunded.`,
+                  );
+                  return;
+                }
                 setError(result.message);
                 return;
               }
@@ -98,6 +121,7 @@ export function BillingCheckout() {
                 message: result.message,
                 loginUrl: result.loginUrl,
                 emailSent: result.emailSent,
+                alreadyActive: result.alreadyActive,
               });
             } finally {
               setIsPending(false);
