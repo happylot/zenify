@@ -1,31 +1,31 @@
 # AGENTS.md — zenify
 
-## 1. Đọc `./CLAUDE.md` trước
+## 1. Read `./CLAUDE.md` first
 
-Trước khi đọc hay sửa code trong repo này, đọc `./CLAUDE.md` của repo: lệnh build/test, lệnh chậm hoặc nguy hiểm, convention, cách verify, deploy, gotcha. Repo `zenify-kit` không có `CLAUDE.md`: đọc `./ARCHITECTURE.md` thay thế.
+Before reading or editing code in this repo, read the repo's `./CLAUDE.md`: build/test commands, slow or dangerous commands, conventions, how to verify, deploy, gotchas. The `zenify-kit` repo has no `CLAUDE.md`: read `./ARCHITECTURE.md` instead.
 
-## 2. Đọc tài liệu cấp workspace
+## 2. Read the workspace-level docs
 
-Codex không tự nạp file của thư mục cha nằm ngoài git root, nên phải đọc bằng tay.
+Codex does not load files from a parent directory outside the git root, so read them by hand.
 
-- Workspace là thư mục cha gần nhất có thư mục con `repos/`. Từ main checkout (`repos/zenify`) là `../../`; từ worktree (`repos/zenify/.worktrees/` + slug) là `../../../../`. Kiểm bằng `ls` trước khi đọc, không đoán.
-- Tại workspace, đọc theo thứ tự:
-  1. `CLAUDE.md` — bảng routing repo, hạ tầng dùng chung, quy ước git và worktree.
-  2. `.claude/rules/00-constitution.md` — luôn áp dụng.
-  3. Mỗi rule trong `.claude/rules/` có front-matter `paths:` khớp file đang chạm.
-  4. `.claude/memory/MEMORY.md` — index; mở file memory khớp với việc đang làm.
+- The workspace is the nearest parent directory that has a `repos/` subdirectory. From the main checkout (`repos/zenify`) it is `../../`; from a worktree (`repos/zenify/.worktrees/` + slug) it is `../../../../`. Check with `ls` before reading; never guess.
+- At the workspace, read in this order:
+  1. `CLAUDE.md` — repo routing table, shared infrastructure, git and worktree conventions.
+  2. `.claude/rules/00-constitution.md` — always applies.
+  3. Every rule in `.claude/rules/` whose `paths:` front-matter matches the file being touched.
+  4. `.claude/memory/MEMORY.md` — the index; open the memory file that matches the work at hand.
 
-## 3. Ghi chú khi chạy trên Codex
+## 3. Notes when running on Codex
 
-- Gọi skill của kit bằng tiền tố `$znf:` cộng tên skill, ví dụ `$znf:fix`, `$znf:ship`. Đối số là phần chữ đứng sau tên skill trong cùng tin nhắn; Codex không có `$ARGUMENTS`.
-- Subagent được tạo bằng tool subagent của Codex, với các agent cùng tên như kit: `scout`, `code-reviewer`, `ui-verifier`, `researcher`, `architect`.
-- Thiếu hụt chấp nhận so với Claude Code:
-  - Không có hook read-guard: tự đọc file trước khi sửa, không sửa file chưa đọc trong phiên.
-  - Không có Workflow tool: bước nào của skill cần Workflow thì làm tuần tự, hoặc chia cho subagent.
+- Invoke a kit skill with the `$znf:` prefix plus the skill name, e.g. `$znf:fix`, `$znf:ship`. The argument is the text after the skill name in the same message; Codex has no `$ARGUMENTS`.
+- Subagents are created with Codex's subagent tool, using the same agent names as the kit: `scout`, `code-reviewer`, `ui-verifier`, `researcher`, `architect`.
+- Accepted gaps compared to Claude Code:
+  - No read-guard hook: read a file before editing it; never edit a file not read in this session.
+  - No Workflow tool: a skill step that needs Workflow runs sequentially, or is split across subagents.
 
 ## Code Review Rules
 
-- Không fabricate: mọi tên file, hàm, field, collection, endpoint phải đã đọc trong phiên; khẳng định không hiển nhiên phải trích `file:dòng`.
-- Không đổi hợp đồng dùng chung (collection Mongo, bảng MySQL, kênh Redis, payload BullMQ, HTTP giữa service) khi chưa sweep đủ 8 repo liệt kê trong `CLAUDE.md` workspace.
-- Không merge PR, kể cả PR do agent mở; merge là quyết định deploy của người dùng.
-- Chỉ báo finding mức P0/P1, mỗi finding kèm `file:dòng`; không báo góp ý phong cách.
+- No fabrication: every file, function, field, collection and endpoint name must have been read in this session; a non-obvious claim cites `file:line`.
+- Do not change a shared contract (Mongo collection, MySQL table, Redis channel, BullMQ payload, HTTP between services) without sweeping all 8 repos listed in the workspace `CLAUDE.md`.
+- Never merge a PR, including one the agent opened; merging is the user's deploy decision.
+- Report only P0/P1 findings, each with `file:line`; no style remarks.
